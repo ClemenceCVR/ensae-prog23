@@ -79,7 +79,7 @@ class Graph:
 
 #Question2
 
-    def connected_components(self): #complexité en O(nb_nodes + nb_edges)
+    def connected_components(self): #complexité en O(nb_nodes + nb_edges) = O(V+E)
         licomponents = []
         visited_node = {noeud:False for noeud in self.nodes}
 
@@ -111,7 +111,7 @@ class Graph:
 
 
 #Question3 
-    def get_path_with_power(self, src, dest, power): #complexité en O(nb_edges log(nb_edges))
+    def get_path_with_power(self, src, dest, power): #complexité en O(nb_edges log(nb_edges))=O(Elog(E))
         #on va faire quelque chose de récursif, on va à chaue fois regarder les voisins des voisins pour trouver le chemin
         #on va s'inspirer fortement de connected_components
         visited_node = {noeud:False for noeud in self.nodes}
@@ -131,7 +131,7 @@ class Graph:
         return path_research(src, [src]) #on part de la source "src"
 
 #Question5 : bonus
-    def get_shorter_path_with_power(self, src, dest, power):
+    def get_shorter_path_with_power(self, src, dest, power): #complexité en O(E(V+E)log(V))
         #on va utiliser l'algorithme de Dijkstra avec la condition sur la puissance
         d_dist={noeud : None for noeud in self.nodes}
         d_dist[src]=0 #la distance entre src et src est 0
@@ -176,7 +176,7 @@ class Graph:
                 return None #on a visité tous les voisins mais on n'a rien trouvé
             return path_research(src, [src], 0)
 
-    def min_power(self, src, dest):
+    def min_power(self, src, dest): #complexité en O(E(V+E)log(V))
         """
         Should return path, min_power. 
         """
@@ -185,7 +185,7 @@ class Graph:
         a=0
         b=1
         def dichotomie(a,b):
-            while b-a>0.5:
+            while b-a>0.2:
                 if self.get_path_with_power2(src, dest, (a+b)/2)!=None:
                     b=(a+b)/2
                 else:
@@ -206,19 +206,8 @@ class Graph:
 #Question 9 : bonus 
 
 
-
-
-
-
-
-
-
-
-
-
-
 #Question1 et Question4
-def graph_from_file(filename):
+def graph_from_file(filename): #complexité en O(E)
     """
     Reads a text file and returns the graph as an object of the Graph class.
 
@@ -276,9 +265,6 @@ def graph_from_file_dist(filename):
     return G
 
 
-
-
-
 #Séance2
 
 #Question10
@@ -323,12 +309,12 @@ class UnionFind:
         self.parent = [k for k in range(n+1)] #tableau qui contient le parent de chaque élément, initialisé à lui-même
         self.rank = [0]*n #stocke la hauteur (=le rang) de chaque arbre
 
-    def find(self, x): #trouver l'ensemble auquel x appartient en remontant la chaine de parents
+    def find(self, x): #complexité en O(log(n))
         if self.parent[x] != x: #si x n'est pas la racine, on continue 
             self.parent[x] = self.find(self.parent[x]) #récursivité + on comprime pour être plus efficace
         return self.parent[x]
 
-    def union(self, x, y): #relier les arbres
+    def union(self, x, y): #complexité en O(1)
         root_x, root_y = self.find(x), self.find(y) #on trouve les racines de x et y
         if self.rank[root_x] < self.rank[root_y]:
             self.parent[root_x] = root_y #on relie l'arbre de hauteur inférieur à la racine de l'arbre de rang supérieur 
@@ -338,7 +324,7 @@ class UnionFind:
             self.parent[root_y] = root_x #si même rang, on les relie + on augmete le rang 
             self.rank[root_x] += 1
     
-def kruskal(g):
+def kruskal(g): #complexité de O(Elog(E))
     edges=[]
     sorted_edges=[]
     for node in g.graph:
@@ -358,7 +344,7 @@ def kruskal(g):
 
 
 #Question14
-def oriented_tree(g,root=1): 
+def oriented_tree(g,root=1): #complexité en O(V+E)
     parent = [k for k in range(g.nb_nodes+1)] #tableau qui contient le parent de chaque élément, initialisé à lui-même
     rank = [0]*(g.nb_nodes+1)
     power = [0]*(g.nb_nodes+1)
@@ -376,7 +362,7 @@ def oriented_tree(g,root=1):
 #recherche du trajet et de la puissance minimale avec la source et la destination = deux noeuds qu'on souhaite relier 
 #Si le rang des deux noeuds n'est pas le meme par rapport au premier noeud
 #alors on remonte l'arbre de parenté
-def min_power_kruskal(g, dfs, src, dest):
+def min_power_kruskal(g, dfs, src, dest): #complexité en O(Elog(E))
     parent=dfs[0]
     rank=dfs[1]
     power=dfs[2]
@@ -406,6 +392,8 @@ def min_power_kruskal(g, dfs, src, dest):
 #Question15
 #on estime le temps mais avec l'arbre couvrant de poids minimal
 
+
+#la complexité est O(EVlog(V)log(E))
 def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
     assert nb_file in [i for i in range(1,11)] #on vérifie qu'il est bien entre 1 et 10
     name_route_file="input/routes."+ str(nb_file) + ".in"
@@ -415,7 +403,7 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
     sum = 0
     p1="input/network."
     p2=".in"
-    for i in range(4): #on estime le temps avec les 10 premières lignes du fichier
+    for i in range(5): #on estime le temps avec les 5 premières lignes du fichier
         ligne = f.readline().split()
         node1 = int(ligne[0])
         node2 = int(ligne[1])
@@ -426,7 +414,7 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
         res = min_power_kruskal(g, oriented_tree(g), node1, node2)
         t_fin = time.perf_counter()
         sum = sum + t_fin - t_dep
-    return n * (sum/4)
+    return n * (sum/5)
 
 
 
