@@ -358,7 +358,7 @@ def kruskal(g):
 
 
 #Question14
-def orienter_arbre(g,root=1): 
+def oriented_tree(g,root=1): 
     parent = [k for k in range(g.nb_nodes+1)] #tableau qui contient le parent de chaque élément, initialisé à lui-même
     rank = [0]*(g.nb_nodes+1)
     power = [0]*(g.nb_nodes+1)
@@ -423,7 +423,7 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
         name_network_file=p1+str(nb_file)+p2
         g=graph_from_file(name_network_file)
         g=kruskal(g)
-        res = min_power_kruskal(g, orienter_arbre(g), node1, node2)
+        res = min_power_kruskal(g, oriented_tree(g), node1, node2)
         t_fin = time.perf_counter()
         sum = sum + t_fin - t_dep
     return n * (sum/4)

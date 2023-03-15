@@ -25,3 +25,10 @@ g.add_edge(4, 5, 5)
 print(g)
 print(kruskal(g))
 #on voit que l'arbre que la fonction kruskal renvoie est bien un arbre couvrant de poids minimal
+
+
+
+#sur un graphe encore plus grand
+gnet1bis = graph_from_file("input/network.1.in")
+print(gnet1bis)
+print(kruskal(gnet1bis))

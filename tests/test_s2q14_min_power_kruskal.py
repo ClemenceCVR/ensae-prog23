@@ -1,6 +1,6 @@
 import sys 
 sys.path.append("delivery_network")
-from graph import Graph, UnionFind, graph_from_file, kruskal, min_power_kruskal, orienter_arbre
+from graph import Graph, UnionFind, graph_from_file, kruskal, min_power_kruskal, oriented_tree
 import time
 
 
@@ -16,7 +16,7 @@ g.add_edge(4, 5, 5)
 
 g1=kruskal(g)
 t_dep= time.perf_counter()
-h=orienter_arbre(g1)
+h=oriented_tree(g1)
 min_pwg, traj_g=min_power_kruskal(g1, h, 4, 2)
 t_fin= time.perf_counter()
 t=t_fin-t_dep
@@ -30,7 +30,7 @@ print("Pour le petit graphe, la puissance minimale pour ce trajet est ", min_pwg
 g=graph_from_file("input/network.2.in")
 g2=kruskal(g)
 t_dep= time.perf_counter()
-h=orienter_arbre(g2)
+h=oriented_tree(g2)
 min_pwg, traj_g=min_power_kruskal(g2, h, 1000, 30)
 t_fin= time.perf_counter()
 t=t_fin-t_dep
