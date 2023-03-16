@@ -402,12 +402,12 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
     ligne1 = f.readline().split()
     n = int(ligne1[0])
     sum = 0
-    p1="input/network."
-    p2=".in"
-    name_network_file=p1+str(nb_file)+p2
-    g=graph_from_file(name_network_file)
-    g_kruskal=kruskal(g)
-    ot=oriented_tree(g_kruskal)
+    p1 = "input/network."
+    p2 = ".in"
+    name_network_file = p1+str(nb_file)+p2
+    g = graph_from_file(name_network_file)
+    g_kruskal = kruskal(g)
+    ot = oriented_tree(g_kruskal)
     for i in range(n): #on estime le temps avec les 5 premières lignes du fichier
         ligne = f.readline().split()
         node1 = int(ligne[0])
@@ -420,11 +420,27 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
 
 #Séance 4
 
-def convertit_routes_liste(nb_file_route):
+def convert_routes_into_list(nb_file_route):
     nom_fichier_route= "input/routes." + str(nb_file_route) + ".in"
     f=open(nom_fichier_route, 'r')
-    ligne1 = f.readline().split()
-    n = int(ligne1[0])
+    n = int(f.readline().rstrip())
+    paths_profit=[]
+    for i in range(n):
+        line=f.readline().split()
+        node1 = int(line[0])
+        node2 = int(line[1])
+        profit = int(line[2])
+        paths_profit.append([node1, node2, profit])
+    paths_profit_sorted=sorted(paths_profit , key=lambda l: -l[2])
+    return paths_profit_sorted
+
+
+
+
+
+
+
+
 
 
 
