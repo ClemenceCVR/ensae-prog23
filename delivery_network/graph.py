@@ -408,7 +408,7 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
     g=graph_from_file(name_network_file)
     g_kruskal=kruskal(g)
     ot=oriented_tree(g_kruskal)
-    for i in range(5): #on estime le temps avec les 5 premières lignes du fichier
+    for i in range(n): #on estime le temps avec les 5 premières lignes du fichier
         ligne = f.readline().split()
         node1 = int(ligne[0])
         node2 = int(ligne[1])
@@ -416,7 +416,7 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
         res = min_power_kruskal(g_kruskal, ot, node1, node2)
         t_fin = time.perf_counter()
         sum = sum + t_fin - t_dep
-    return n * (sum/5)
+    return sum
 
 #Séance 4
 
