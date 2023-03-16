@@ -362,19 +362,20 @@ def oriented_tree(g,root=1): #complexité en O(V+E)
 #recherche du trajet et de la puissance minimale avec la source et la destination = deux noeuds qu'on souhaite relier 
 #Si le rang des deux noeuds n'est pas le meme par rapport au premier noeud
 #alors on remonte l'arbre de parenté
-def min_power_kruskal(g, dfs, src, dest): #complexité en O(Elog(E))
-    parent=dfs[0]
-    rank=dfs[1]
-    power=dfs[2]
-    min_pkr=0
-    traj_src=[]
-    traj_d=[]
+
+def min_power_kruskal(g, dfs, src, dest): # complexité en O(Elog(E))
+    parent = dfs[0]
+    rank = dfs[1]
+    power = dfs[2]
+    min_pkr = 0
+    traj_src = []
+    traj_d = []
     while rank[src] < rank[dest]:
-        min_pkr=max(power[dest], min_pkr) #à chaque fois qu'on remonte l'arbre, on vérifie qu'on a bien la puissance minimale (max parmi les arêtes)
-        traj_d+=[dest] #Pour faire le trajet on ajoute le noeud à chaque itération à la liste de trajet
-        dest=parent[dest] #on remonte l'arbre 
+        min_pkr = max(power[dest], min_pkr) #à chaque fois qu'on remonte l'arbre, on vérifie qu'on a bien la puissance minimale (max parmi les arêtes)
+        traj_d += [dest] #Pour faire le trajet on ajoute le noeud à chaque itération à la liste de trajet
+        dest = parent[dest] #on remonte l'arbre 
     while rank[dest] < rank[src]:  #de même mais cette fois si le rang de la source est supérieur au rag de la destination
-        min_pkr=max(power[src], min_pkr)
+        min_pkr = max(power[src], min_pkr)
         traj_src+=[src]
         src=parent[src]
     while dest !=src: #une fois au même rang, on travaille sur les deux noeuds (source et destination)
@@ -403,18 +404,32 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
     sum = 0
     p1="input/network."
     p2=".in"
+    name_network_file=p1+str(nb_file)+p2
+    g=graph_from_file(name_network_file)
+    g_kruskal=kruskal(g)
+    ot=oriented_tree(g_kruskal)
     for i in range(5): #on estime le temps avec les 5 premières lignes du fichier
         ligne = f.readline().split()
         node1 = int(ligne[0])
         node2 = int(ligne[1])
         t_dep = time.perf_counter()
-        name_network_file=p1+str(nb_file)+p2
-        g=graph_from_file(name_network_file)
-        g=kruskal(g)
-        res = min_power_kruskal(g, oriented_tree(g), node1, node2)
+        res = min_power_kruskal(g_kruskal, ot, node1, node2)
         t_fin = time.perf_counter()
         sum = sum + t_fin - t_dep
     return n * (sum/5)
+
+#Séance 4
+
+def convertit_routes_liste(nb_file_route):
+    nom_fichier_route= "input/routes." + str(nb_file_route) + ".in"
+    f=open(nom_fichier_route, 'r')
+    ligne1 = f.readline().split()
+    n = int(ligne1[0])
+
+
+
+
+
 
 
 
