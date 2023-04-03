@@ -419,6 +419,7 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
     return sum
 
 #Séance 4
+#Question 18
 
 def routes_from_file(nb_file_routes): 
     filename = "input/routes." + str(nb_file_routes) + ".in"
@@ -442,14 +443,61 @@ def routes_from_file(nb_file_routes):
     return paths_profit_sorted
 
 
+#expliquer que l'algo du sac à dos ne donne pas une solution exacte 
+#tester les fichiers à la main mais aussi faire des fichiers tests
+#pour la méthode exacte, la complexité est exponentielle 
 
+def trucks_from_file_dic(nb_file_trucks): 
+    filename = "input/trucks." + str(nb_file_trucks) + ".in" #on crée le fichier et on l'ouvre
+    f = open(filename, 'r')
+    n = int(f.readline().rstrip())
+    dict_trucks=dict()
+    for i in range(n):
+        line=f.readline().split()
+        power = int(line[0])
+        price = int(line[1])
+        dict_trucks[power]=price
+    return dict_trucks 
 
+def trucks_from_file_list(nb_file_trucks): 
+    filename = "input/trucks." + str(nb_file_trucks) + ".in" #on crée le fichier et on l'ouvre
+    f = open(filename, 'r')
+    n = int(f.readline().rstrip())
+    truck_list=[] #on initialise une liste pour stocker les camions
+    for i in range(n):
+        line=f.readline().split()
+        power = int(line[0])
+        price = int(line[1])
+        truck_list.append((power, price)) #on ajoute à la liste de camions
+    return truck_list
 
+'''Le but de la fonction suivante est de retirer les camions avec une puissance plus faible et un prix plus élevé qu'un autre camion, (le camion est moins maniable et rentable) '''
+def sorted_trucks(truck_list): #truck_list de la forme (power, price)
+    truck_list=sorted(truck_list, key= lambda u: -u[0]) #on trie la liste par ordre décroissant de puissance
+    validated_trucks=[truck_list[0]] #on initialise avec le premier
+    price2=truck_list[0][1] #on initialise la variable de prix au premier prix 
+    for i in range(1, len(truck_list)):
+        #si le prix du camion est inférieur au prix actuel, on ajoute le camion à la liste validée et on met à jour le prix actuel
+        if truck_list[i][1] < price2 : 
+            validated_trucks.append((truck_list[i][0], truck_list[i][1]))
+            price2=truck_list[i][1]
+    validated_trucks=validated_trucks[::-1] #on retourne la liste pour avoir l'ordre croissant de prix
+    return validated_trucks
 
-
-
-
-
+def choose_truck(power, truck_list): #truck_list =liste de (power, price) triée
+    if power > truck_list[-1][0]: 
+        return None #si même celui qui a la puissance la plus grande ne peut pas faire le trajet, aucun camion peut le faire
+    #on va faire une dichotomie sur l'indice des camions
+    first = 0
+    last = len(truck_list) - 1
+    while first < last:
+        middle = (first+last) // 2
+        truck = truck_list[middle]
+        if truck[0] < power:
+            first = middle + 1
+        else: 
+            last =  middle
+    return truck_list[first] #on renvoie le camion choisi
 
 
 

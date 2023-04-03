@@ -1,8 +1,12 @@
-from graph import Graph, graph_from_file, convert_routes_into_list
+from graph import Graph, trucks_from_file_list, sorted_trucks, choose_truck
+
+camion = trucks_from_file_list(1)
+#print('camion', camion)
+camiontrie= sorted_trucks(camion)
+#print('camiontrie', camiontrie)
+choisi= choose_truck(2800000, camiontrie)
+print(choisi)
 
 
-data_path = "input/"
 
-h=convert_routes_into_list(1)
-print(h)
 
