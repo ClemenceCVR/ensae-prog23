@@ -1,4 +1,4 @@
-#Pour faire des tests, il faut sauvegarder le doc (Ctrl+S), puis après mettre dans le terminal avec python3.exe tests/lenomdutest, on peut utiliser tab pour aller plus vite
+# Pour faire des tests, il faut sauvegarder le doc (Ctrl+S), puis après mettre dans le terminal avec python3.exe tests/lenomdutest, on peut utiliser tab pour aller plus vite
 import time
 from graphviz import Graph as g
 
@@ -34,7 +34,7 @@ class Graph:
         self.nb_edges = 0
     
 
-    def __str__(self): #complexité en O(nb_edges)
+    def __str__(self): # Complexité en O(nb_edges)
         """Prints the graph as a list of neighbors for each node (one per line)"""
         if not self.graph:
             output = "The graph is empty"            
@@ -46,8 +46,8 @@ class Graph:
         
 
 
- #Question1   
-    def add_edge(self, node1, node2, power_min, dist=1): #complexité en O(1)
+ ### Question1   
+    def add_edge(self, node1, node2, power_min, dist=1): # Complexité en O(1)
         """
         Adds an edge to the graph. Graphs are not oriented, hence an edge is added to the adjacency list of both end nodes. 
 
@@ -62,7 +62,7 @@ class Graph:
         dist: numeric (int or float), optional
             Distance between node1 and node2 on the edge. Default is 1.
         """
-        #si le noeud n'est pas dans le dictionnaire (de la forme graph={0:[(1,3,..), (2,...)]})
+        # Si le noeud n'est pas dans le dictionnaire (de la forme graph={0:[(1,3,..), (2,...)]})
         if node1 not in self.graph:
             self.graph[node1] = []
             self.nb_nodes += 1
@@ -71,38 +71,37 @@ class Graph:
             self.graph[node2] = []
             self.nb_nodes += 1
             self.nodes.append(node2)
-        #on rajoute les liens 
+        # On rajoute les liens 
         self.graph[node1].append((node2, power_min, dist))
         self.graph[node2].append((node1, power_min, dist))
         self.nb_edges += 1
         
 
-#Question2
+### Question2
 
-    def connected_components(self): #complexité en O(nb_nodes + nb_edges) = O(V+E)
+    def connected_components(self): # Complexité en O(nb_nodes + nb_edges) = O(V+E)
         licomponents = []
         visited_node = {noeud:False for noeud in self.nodes}
 
-        def profound_path(node): #complexité en O(nb_node)
-        #on initialise la liste avec uniquement le noeud de départ
+        def profound_path(node): # Complexité en O(nb_node)
+        # On initialise la liste avec uniquement le noeud de départ
             component = [node]
             for neighbor in self.graph[node]:
-                neighbor=neighbor[0] #on prend le nom du noeud
-                if not visited_node[neighbor]: #s'il n'est pas encore visité
-                    visited_node[neighbor]=True #on change pour le mettre en mode visité
-                    component += profound_path(neighbor) #récursivement, on ajoute les autres voisins
-            return component #on retourne une liste qui donne tous les noeuds accessibles depuis le noeud de départ
+                neighbor = neighbor[0] # On prend le nom du noeud
+                if not visited_node[neighbor]: # S'il n'est pas encore visité
+                    visited_node[neighbor] = True # On change pour le mettre en mode visité
+                    component += profound_path(neighbor) # Récursivement, on ajoute les autres voisins
+            return component # On retourne une liste qui donne tous les noeuds accessibles depuis le noeud de départ
 
         for node in self.nodes:
             if not visited_node[node]:
                 licomponents.append(profound_path(node))
         return licomponents
-#cout de la fonction exploration : O(1) + nb d'arrêtes + nb de sommets
-#la complexité de la méthode est O(n+m)= O(V+E)
+        # Cout de la fonction exploration : O(1) + nb d'arrêtes + nb de sommets
+        # La complexité de la méthode est O(n+m)= O(V+E)
+        # Frozenset : comme une liste, mais où l'ordre n'importe pas, et les répétitions non plus, c'est comme un ensemble, et supprime les redondances
 
-#frozenset : comme une liste, mais où l'ordre n'importe pas, et les répétitions non plus, c'est comme un ensemble, et supprime les redondances
-
-    def connected_components_set(self): #comme connected_components
+    def connected_components_set(self): # Complexité en O(V+E) comme connected_components
         """
         The result should be a set of frozensets (one per component), 
         For instance, for network01.in: {frozenset({1, 2, 3}), frozenset({4, 5, 6, 7})}
@@ -110,104 +109,104 @@ class Graph:
         return set(map(frozenset, self.connected_components()))
 
 
-#Question3 
-    def get_path_with_power(self, src, dest, power): #complexité en O(nb_edges log(nb_edges))=O(Elog(E))
-        #on va faire quelque chose de récursif, on va à chaue fois regarder les voisins des voisins pour trouver le chemin
-        #on va s'inspirer fortement de connected_components
+###Question3 
+    def get_path_with_power(self, src, dest, power): # Complexité en O(nb_edges log(nb_edges))=O(Elog(E))
+        # On va faire quelque chose de récursif, on va à chaque fois regarder les voisins des voisins pour trouver le chemin
+        # On va s'inspirer fortement de connected_components
         visited_node = {noeud:False for noeud in self.nodes}
-        visited_node[src]=True
+        visited_node[src] = True
 
-        def path_research(noeud, path): #on va faire une recherche de chemin en partant du noeud "noeud"
-            if noeud == dest: #le chemin qui va directement à destination
+        def path_research(noeud, path): # On va faire une recherche de chemin en partant du noeud "noeud"
+            if noeud == dest: # Le chemin qui va directement à destination
                 return path
-            for neighbor in self.graph[noeud]: #pour chaque voisin on cherche le voisin
+            for neighbor in self.graph[noeud]: # Pour chaque voisin on cherche le voisin
                 neighbor, power_min, dist = neighbor
-                if not visited_node[neighbor] and power_min <= power: #on ne veut pas repasser un même noeud + il faut que la puissance de la voiture soit supérieure à la puissance de la route
-                    visited_node[neighbor]=True #le noeud voisin est visité
-                    res=path_research(neighbor, path+[neighbor]) #on applique au voisin, avec le chemin de base + le voisin
+                if not visited_node[neighbor] and power_min <= power: # On ne veut pas repasser un même noeud + il faut que la puissance de la voiture soit supérieure à la puissance de la route
+                    visited_node[neighbor] = True # Le noeud voisin est visité
+                    res=path_research(neighbor, path+[neighbor]) # On applique au voisin, avec le chemin de base + le voisin
                     if res is not None:
                         return res
-            return None #on a visité tous les voisins mais on n'a rien trouvé
-        return path_research(src, [src]) #on part de la source "src"
+            return None # On a visité tous les voisins mais on n'a rien trouvé
+        return path_research(src, [src]) # On part de la source "src"
 
-#Question5 : bonus
-    def get_shorter_path_with_power(self, src, dest, power): #complexité en O(E(V+E)log(V))
-        #on va utiliser l'algorithme de Dijkstra avec la condition sur la puissance
-        d_dist={noeud : None for noeud in self.nodes}
-        d_dist[src]=0 #la distance entre src et src est 0
-        d_power={noeud : None for noeud in self.nodes} #on initialise tous les noeuds à +l'infini, ou ici, None pour faciliter
-        d_power[src]=0 #la puissance nécessaire pour aller de src à src est 0
-        path={noeud:[] for noeud in self.nodes}
-        path[src]=[src]
-        #on veut créer un sous-graphe tel que la distanc entre un sommet et src soit connue et minimale
-        sub_graph=[(0,src)]
-        while sub_graph !=[]:
+###Question5 : bonus
+    def get_shorter_path_with_power(self, src, dest, power): #  Complexité en O(E(V+E)log(V))
+        # On va utiliser l'algorithme de Dijkstra avec la condition sur la puissance
+        d_dist = {noeud : None for noeud in self.nodes}
+        d_dist[src] = 0 # La distance entre src et src est 0
+        d_power = {noeud : None for noeud in self.nodes} # On initialise tous les noeuds à +l'infini, ou ici, None pour faciliter
+        d_power[src] = 0 # La puissance nécessaire pour aller de src à src est 0
+        path = {noeud:[] for noeud in self.nodes}
+        path[src] = [src]
+        # On veut créer un sous-graphe tel que la distanc entre un sommet et src soit connue et minimale
+        sub_graph = [(0,src)]
+        while sub_graph != []:
             dist_node, node = min(sub_graph)
             sub_graph.remove((dist_node, node))
-            if node == dest: #si ça atteint l'arrivée
+            if node == dest: # Si ça atteint l'arrivée
                 return path[dest]
             for other_node in self.graph[node]:
                 other_node, necessary_power, dist_between = other_node
-                if necessary_power<= power : 
-                    if d_power[other_node] is None or dist_between + d_dist[node]< d_dist[other_node]: #on veut prendre le minimum, on teste s'il y a mieux
-                        d_power[other_node]=max(d_power[node], necessary_power)
-                        d_dist[other_node]=dist_between + d_dist[node]
-                        path[other_node]=path[node]+[other_node]
+                if necessary_power <= power : 
+                    if d_power[other_node] is None or dist_between + d_dist[node] < d_dist[other_node]: # On veut prendre le minimum, on teste s'il y a mieux
+                        d_power[other_node] = max(d_power[node], necessary_power)
+                        d_dist[other_node] = dist_between + d_dist[node]
+                        path[other_node] = path[node]+[other_node]
                         sub_graph.append((d_dist[other_node], other_node))
         return None
 
 
-#Question6
-    #on fait la même fonction en rajoutant P
+###Question6
+    # On fait presque la même fonction
     def get_path_with_power2(self, src, dest, power):
             visited_node = {noeud:False for noeud in self.nodes}
-            visited_node[src]=True
+            visited_node[src] = True
 
-            def path_research(noeud, path, P): #on va faire une recherche de chemin en partant du noeud "noeud"
-                if noeud == dest: #le chemin qui va directement à destination
+            def path_research(noeud, path, P): # On va faire une recherche de chemin en partant du noeud "noeud"
+                if noeud == dest: # Le chemin qui va directement à destination
                     return path, P 
-                for neighbor in self.graph[noeud]: #pour chaque voisin on cherche le voisin
+                for neighbor in self.graph[noeud]: # Pour chaque voisin on cherche le voisin
                     neighbor, power_min, dist = neighbor
-                    if not visited_node[neighbor] and power_min <= power: #on ne veut pas repasser un même noeud + il faut que la puissance de la voiture soit supérieure à la puissance de la route
-                        visited_node[neighbor]=True #le noeud voisin est visité
-                        res=path_research(neighbor, path+[neighbor], P) #on applique au voisin, avec le chemin de base + le voisin
+                    if not visited_node[neighbor] and power_min <= power: # On ne veut pas repasser un même noeud + il faut que la puissance de la voiture soit supérieure à la puissance de la route
+                        visited_node[neighbor] = True # Le noeud voisin est visité
+                        res=path_research(neighbor, path+[neighbor], P) # On applique au voisin, avec le chemin de base + le voisin
                         if res is not None:
                             return res
-                return None #on a visité tous les voisins mais on n'a rien trouvé
+                return None # On a visité tous les voisins mais on n'a rien trouvé
             return path_research(src, [src], 0)
 
-    def min_power(self, src, dest): #complexité en O(E(V+E)log(V))
+    def min_power(self, src, dest): # Complexité en O(E(V+E)log(V))
         """
         Should return path, min_power. 
         """
-        #calcule la puissance minimale pour couvrir le trajet
+        # Calcule la puissance minimale pour couvrir le trajet
         
-        a=0
-        b=1
+        a = 0
+        b = 1
         def dichotomie(a,b):
-            while b-a>0.2:
-                if self.get_path_with_power2(src, dest, (a+b)/2)!=None:
-                    b=(a+b)/2
+            while b-a > 0.2:
+                if self.get_path_with_power2(src, dest, (a+b)/2)!= None:
+                    b = (a+b)/2
                 else:
                     a = (a+b)/2
                 dichotomie(a,b)
             return self.get_path_with_power2(src, dest,b), b
-        while self.get_path_with_power2(src, dest,b)==None:
+        while self.get_path_with_power2(src, dest,b) == None:
             b=2*b
         return dichotomie(a,b)
 
-#Question7 : bonus
+###Question7 : bonus
 "cf test_s1q7_graph"
 
-#Question 8 : implémenter d'autres tests 
+###Question 8 : implémenter d'autres tests 
 
 "les tests sont complétés"
 
-#Question 9 : bonus 
+###Question 9 : bonus 
 
 
-#Question1 et Question4
-def graph_from_file(filename): #complexité en O(E)
+###Question1 et Question4
+def graph_from_file(filename): # Complexité en O(E)
     """
     Reads a text file and returns the graph as an object of the Graph class.
 
@@ -234,136 +233,136 @@ def graph_from_file(filename): #complexité en O(E)
             edge = list(map(int, file.readline().split()))
             if len(edge) == 3:
                 node1, node2, power_min = edge
-                g.add_edge(node1, node2, power_min) # will add dist=1 by default
+                g.add_edge(node1, node2, power_min) # Will add dist=1 by default
             elif len(edge) == 4:
                 node1, node2, power_min, dist = edge
                 g.add_edge(node1, node2, power_min, dist)
             else:
                 raise Exception("Format incorrect")
         return g
-# ou sinon, ce code : 
-#Question4
+# Ou sinon, ce code : 
+###Question4
 def graph_from_file_dist(filename):
-    #n=nombre de noeud
-    #m=nombre d'arêtes
+    # n=nombre de noeud
+    # m=nombre d'arêtes
     with open(filename, 'r') as file:
-        ligne1=file.readline().split()
-        n=int(ligne1[0])
-        m=int(ligne1[1])
+        ligne1 = file.readline().split()
+        n = int(ligne1[0])
+        m = int(ligne1[1])
         nodes = [i for i in range(1, n+1)]
-        G=Graph(nodes)
+        G = Graph(nodes)
         for i in range(m):
-            lignei=file.readline().split()
-            node1=int(lignei[0])
-            node2=int(lignei[1])
-            power_min=int(lignei[2])
-            if len(lignei)==3:
+            lignei = file.readline().split()
+            node1 = int(lignei[0])
+            node2 = int(lignei[1])
+            power_min = int(lignei[2])
+            if len(lignei) == 3:
                 G.add_edge(node1, node2, power_min)
             else:
-                dist=int(lignei[3])
+                dist = int(lignei[3])
                 G.add_edge(node1, node2, power_min, dist)       
     return G
 
 
-#Séance2
+###Séance2
 
-#Question10
-#on doit tester le temps sur min_power
-#ce n'est pas assez optimal, donc ça motive le reste de la séance
+###Question10
+# On doit tester le temps sur min_power
+# Ce n'est pas assez optimal, donc ça motive le reste de la séance
     
 '''voir test_s2q10_time.py pour l'éxecution'''
-def estimated_time(nb_file): #entrer le numéro du fichier
-    assert nb_file in [i for i in range(1,11)] #on vérifie qu'il est bien entre 1 et 10
-    name_route_file="input/routes."+ str(nb_file) + ".in"
-    f=open(name_route_file, 'r')
+def estimated_time(nb_file): # Entrer le numéro du fichier
+    assert nb_file in [i for i in range(1,11)] # On vérifie qu'il est bien entre 1 et 10
+    name_route_file = "input/routes." + str(nb_file) + ".in"
+    f = open(name_route_file, 'r')
     ligne1 = f.readline().split()
     n = int(ligne1[0])
     sum = 0
-    p1="input/network."
-    p2=".in"
-    for i in range(4): #on estime le temps avec les 10 premières lignes du fichier
+    p1 = "input/network."
+    p2 = ".in"
+    for i in range(4): # On estime le temps avec les 10 premières lignes du fichier
         ligne = f.readline().split()
         node1 = int(ligne[0])
         node2 = int(ligne[1])
         t_dep = time.perf_counter()
-        name_network_file=p1+str(nb_file)+p2
+        name_network_file = p1 + str(nb_file) + p2
         res = graph_from_file(name_network_file).min_power(node1, node2)
         t_fin = time.perf_counter()
         sum = sum + t_fin - t_dep
     return (n * sum/4)
 
-#Question11 : bonus
+###Question11 : bonus
 
-#Question12
+###Question12
 
-#on trie les arêtes par poids croissant
-#dans l'ordre on ajoute à l'arbre les arêtes si elle ne fait pas de cycle avec les arêtes déjà ajoutées
-#poids de l'arbre = somme des arêtes
-#si même poids d'arêtes, on refait avec un ordre différent mais revient au même
+# On trie les arêtes par poids croissant
+# Dans l'ordre on ajoute à l'arbre les arêtes si elle ne fait pas de cycle avec les arêtes déjà ajoutées
+# Poids de l'arbre = somme des arêtes
+# Si même poids d'arêtes, on refait avec un ordre différent mais revient au même
 class UnionFind:
     def __init__(self, n):
         """
         Initialise la structure de données Union-Find avec n éléments,
         chacun étant initialement dans sa propre partition.
         """
-        self.parent = [k for k in range(n+1)] #tableau qui contient le parent de chaque élément, initialisé à lui-même
-        self.rank = [0]*n #stocke la hauteur (=le rang) de chaque arbre
+        self.parent = [k for k in range(n+1)] # Tableau qui contient le parent de chaque élément, initialisé à lui-même
+        self.rank = [0] * n # Stocke la hauteur (=le rang) de chaque arbre
 
-    def find(self, x): #complexité en O(log(n))
-        if self.parent[x] != x: #si x n'est pas la racine, on continue 
-            self.parent[x] = self.find(self.parent[x]) #récursivité + on comprime pour être plus efficace
+    def find(self, x): # Complexité en O(log(n))
+        if self.parent[x] != x: # Si x n'est pas la racine, on continue 
+            self.parent[x] = self.find(self.parent[x]) # Récursivité + on comprime pour être plus efficace
         return self.parent[x]
 
-    def union(self, x, y): #complexité en O(1)
-        root_x, root_y = self.find(x), self.find(y) #on trouve les racines de x et y
+    def union(self, x, y): # Complexité en O(1)
+        root_x, root_y = self.find(x), self.find(y) # On trouve les racines de x et y
         if self.rank[root_x] < self.rank[root_y]:
-            self.parent[root_x] = root_y #on relie l'arbre de hauteur inférieur à la racine de l'arbre de rang supérieur 
+            self.parent[root_x] = root_y # On relie l'arbre de hauteur inférieur à la racine de l'arbre de rang supérieur 
         elif self.rank[root_x] > self.rank[root_y]:
             self.parent[root_y] = root_x
         else:
-            self.parent[root_y] = root_x #si même rang, on les relie + on augmete le rang 
+            self.parent[root_y] = root_x # Si même rang, on les relie + on augmete le rang 
             self.rank[root_x] += 1
     
-def kruskal(g): #complexité de O(Elog(E))
-    edges=[]
-    sorted_edges=[]
+def kruskal(g): # Complexité de O(Elog(E))
+    edges = []
+    sorted_edges = []
     for node in g.graph:
         for connected_node, power, dist in g.graph[node]:
             edges.append((power,node,connected_node))
-    sorted_edges=sorted(edges, key=lambda l: l[0]) #on trie les arêtes par poids croissant
-    uf = UnionFind(g.nb_nodes + max(g.nodes)) #on crée une structure d'unionfind, on rajoute le dernier sinon on est out of range dans la suite de la fonction
-    g_mst = Graph() #on va créer l'arbre couvrant de poids minimal
+    sorted_edges = sorted(edges, key=lambda l: l[0]) # On trie les arêtes par poids croissant
+    uf = UnionFind(g.nb_nodes + max(g.nodes)) # On crée une structure d'unionfind, on rajoute le dernier sinon on est out of range dans la suite de la fonction
+    g_mst = Graph() # On va créer l'arbre couvrant de poids minimal
     for power, node1, node2 in sorted_edges:
-        if uf.find(node1)!= uf.find(node2): #on vérifie si ça ne crée pas de cycle 
-            g_mst.add_edge(node1, node2, power) #on l'ajoute à l'arbre couvrant 
-            uf.union(node1, node2) #on les lie 
+        if uf.find(node1) != uf.find(node2): # On vérifie si ça ne crée pas de cycle 
+            g_mst.add_edge(node1, node2, power) # On l'ajoute à l'arbre couvrant 
+            uf.union(node1, node2) # On les lie 
     return g_mst
 
-#Question 13
+###Question 13
 '''voir test_s2q13_kruskal pour les tests'''
 
 
-#Question14
-def oriented_tree(g,root=1): #complexité en O(V+E)
-    parent = [k for k in range(g.nb_nodes+1)] #tableau qui contient le parent de chaque élément, initialisé à lui-même
-    rank = [0]*(g.nb_nodes+1)
-    power = [0]*(g.nb_nodes+1)
-    #on réalise un parcours en profondeur (DFS) de l'arbre, en initialisant à 1 la racine de l'arbre 
+###Question14
+def oriented_tree(g,root=1): # Complexité en O(V+E)
+    parent = [k for k in range(g.nb_nodes+1)] # Tableau qui contient le parent de chaque élément, initialisé à lui-même
+    rank = [0] * (g.nb_nodes+1)
+    power = [0] * (g.nb_nodes+1)
+    # On réalise un parcours en profondeur (DFS) de l'arbre, en initialisant à 1 la racine de l'arbre 
     def DFS(node, father): 
         for child, power_min, dist in g.graph[node]:
-            if child!=father: #ici, le node enfant = le neoud de rang +1 de notre noeud et le noeud father est le noeud de rang-1 de notre noeud
-                parent[child]=node  #on oriente l'enfant vers son parent 
-                rank[child]=rank[node]+1 #le rang de l'enfant est supérieur au rang du noeud 
-                power[child]=power_min #on récupere également la puissance pour notre programme 
-                DFS(child, node) #on définit cette fonction par récursivité 
+            if child!=father: # Ici, le node enfant = le neoud de rang +1 de notre noeud et le noeud father est le noeud de rang-1 de notre noeud
+                parent[child]=node  # On oriente l'enfant vers son parent 
+                rank[child]=rank[node]+1 # Le rang de l'enfant est supérieur au rang du noeud 
+                power[child]=power_min # On récupere également la puissance pour notre programme 
+                DFS(child, node) # On définit cette fonction par récursivité 
     
-    DFS(1,1) #DFS est  une fonction récursive. On appelle DFS sur 1,1 puisque 1 est son propre parent, ce qui nous permet de la lancer sur tout l'arbre
+    DFS(1,1) # DFS est  une fonction récursive. On appelle DFS sur 1,1 puisque 1 est son propre parent, ce qui nous permet de la lancer sur tout l'arbre
     return parent, rank, power 
-#recherche du trajet et de la puissance minimale avec la source et la destination = deux noeuds qu'on souhaite relier 
-#Si le rang des deux noeuds n'est pas le meme par rapport au premier noeud
-#alors on remonte l'arbre de parenté
+# Recherche du trajet et de la puissance minimale avec la source et la destination = deux noeuds qu'on souhaite relier 
+# Si le rang des deux noeuds n'est pas le meme par rapport au premier noeud
+# Alors on remonte l'arbre de parenté
 
-def min_power_kruskal(g, dfs, src, dest): # complexité en O(Elog(E))
+def min_power_kruskal(g, dfs, src, dest): # Complexité en O(Elog(E))
     parent = dfs[0]
     rank = dfs[1]
     power = dfs[2]
@@ -371,40 +370,38 @@ def min_power_kruskal(g, dfs, src, dest): # complexité en O(Elog(E))
     traj_src = []
     traj_d = []
     while rank[src] < rank[dest]:
-        min_pkr = max(power[dest], min_pkr) #à chaque fois qu'on remonte l'arbre, on vérifie qu'on a bien la puissance minimale (max parmi les arêtes)
-        traj_d += [dest] #Pour faire le trajet on ajoute le noeud à chaque itération à la liste de trajet
-        dest = parent[dest] #on remonte l'arbre 
-    while rank[dest] < rank[src]:  #de même mais cette fois si le rang de la source est supérieur au rag de la destination
+        min_pkr = max(power[dest], min_pkr) # A chaque fois qu'on remonte l'arbre, on vérifie qu'on a bien la puissance minimale (max parmi les arêtes)
+        traj_d += [dest] # Pour faire le trajet on ajoute le noeud à chaque itération à la liste de trajet
+        dest = parent[dest] # On remonte l'arbre 
+    while rank[dest] < rank[src]:  # De même mais cette fois si le rang de la source est supérieur au rang de la destination
         min_pkr = max(power[src], min_pkr)
-        traj_src+=[src]
-        src=parent[src]
-    while dest !=src: #une fois au même rang, on travaille sur les deux noeuds (source et destination)
-        #On remonte l'arbre tant que les deux noeuds ne sont pas égaux (auquel cas on a trouvé notre chemin)
-        min_pkr=max(power[src], power[dest], min_pkr)
-        traj_src+=[src]
-        traj_d+=[dest]
-        src=parent[src]
-        dest=parent[dest]
-    traj_f=traj_src+[src]+traj_d[::-1] #on ajoute les trajets depuis la source et depuis la destination ensemble 
+        traj_src += [src]
+        src = parent[src]
+    while dest !=src: # Une fois au même rang, on travaille sur les deux noeuds (source et destination)
+        # On remonte l'arbre tant que les deux noeuds ne sont pas égaux (auquel cas on a trouvé notre chemin)
+        min_pkr = max(power[src], power[dest], min_pkr)
+        traj_src += [src]
+        traj_d += [dest]
+        src = parent[src]
+        dest = parent[dest]
+    traj_f = traj_src + [src] + traj_d[::-1] # On ajoute les trajets depuis la source et depuis la destination ensemble 
     return min_pkr, traj_f
 
 '''voir test_s2q13_kruskal pour les tests'''
 
-#Question15
-#on estime le temps mais avec l'arbre couvrant de poids minimal
-
-
-#la complexité est O(EVlog(V)log(E))
-def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
-    assert nb_file in [i for i in range(1,11)] #on vérifie qu'il est bien entre 1 et 10
-    name_route_file="input/routes."+ str(nb_file) + ".in"
-    f=open(name_route_file, 'r')
+###Question15
+# On estime le temps mais avec l'arbre couvrant de poids minimal
+# La complexité est O(EVlog(V)log(E))
+def estimated_time_kruskal(nb_file): # Entrer le numéro du fichier
+    assert nb_file in [i for i in range(1,11)] # On vérifie qu'il est bien entre 1 et 10
+    name_route_file = "input/routes." + str(nb_file) + ".in"
+    f = open(name_route_file, 'r')
     ligne1 = f.readline().split()
     n = int(ligne1[0])
     sum = 0
     p1 = "input/network."
     p2 = ".in"
-    name_network_file = p1+str(nb_file)+p2
+    name_network_file = p1 + str(nb_file) + p2
     g = graph_from_file(name_network_file)
     g_kruskal = kruskal(g)
     ot = oriented_tree(g_kruskal)
@@ -418,8 +415,8 @@ def estimated_time_kruskal(nb_file): #entrer le numéro du fichier
         sum = sum + t_fin - t_dep
     return sum
 
-#Séance 4
-#Question 18
+###Séance 4
+###Question 18
 
 def routes_from_file(nb_file_routes): 
     filename = "input/routes." + str(nb_file_routes) + ".in"
@@ -443,9 +440,9 @@ def routes_from_file(nb_file_routes):
     return paths_profit_sorted
 
 
-#expliquer que l'algo du sac à dos ne donne pas une solution exacte 
-#tester les fichiers à la main mais aussi faire des fichiers tests
-#pour la méthode exacte, la complexité est exponentielle 
+# L'algo du sac à dos ne donne pas une solution exacte 
+# Tester les fichiers à la main mais aussi faire des fichiers tests
+# Pour la méthode exacte, la complexité est exponentielle 
 
 def trucks_from_file_dic(nb_file_trucks): 
     filename = "input/trucks." + str(nb_file_trucks) + ".in" #on crée le fichier et on l'ouvre
@@ -453,53 +450,70 @@ def trucks_from_file_dic(nb_file_trucks):
     n = int(f.readline().rstrip())
     dict_trucks=dict()
     for i in range(n):
-        line=f.readline().split()
+        line = f.readline().split()
         power = int(line[0])
         price = int(line[1])
-        dict_trucks[power]=price
+        dict_trucks[power] = price
     return dict_trucks 
 
 def trucks_from_file_list(nb_file_trucks): 
     filename = "input/trucks." + str(nb_file_trucks) + ".in" #on crée le fichier et on l'ouvre
     f = open(filename, 'r')
     n = int(f.readline().rstrip())
-    truck_list=[] #on initialise une liste pour stocker les camions
+    truck_list = [] #on initialise une liste pour stocker les camions
     for i in range(n):
-        line=f.readline().split()
+        line = f.readline().split()
         power = int(line[0])
         price = int(line[1])
         truck_list.append((power, price)) #on ajoute à la liste de camions
     return truck_list
 
-'''Le but de la fonction suivante est de retirer les camions avec une puissance plus faible et un prix plus élevé qu'un autre camion, (le camion est moins maniable et rentable) '''
-def sorted_trucks(truck_list): #truck_list de la forme (power, price)
-    truck_list=sorted(truck_list, key= lambda u: -u[0]) #on trie la liste par ordre décroissant de puissance
-    validated_trucks=[truck_list[0]] #on initialise avec le premier
-    price2=truck_list[0][1] #on initialise la variable de prix au premier prix 
+'''Le but de la fonction suivante est de retirer les camions avec une puissance plus faible et un prix plus élevé qu'un autre camion, 
+(le camion est moins maniable et rentable), puis de choisir le meilleur camion pour une puissance de trajet donnée'''
+
+def truck_choice(power, truck_list):
+    truck_list = sorted(truck_list, key= lambda u: -u[0]) # On trie la liste par ordre décroissant de puissance
+    validated_trucks = [truck_list[0]] # On initialise avec le premier
+    price2=truck_list[0][1] # On initialise la variable de prix au premier prix 
     for i in range(1, len(truck_list)):
-        #si le prix du camion est inférieur au prix actuel, on ajoute le camion à la liste validée et on met à jour le prix actuel
+        # Si le prix du camion est inférieur au prix actuel, on ajoute le camion à la liste validée et on met à jour le prix actuel
         if truck_list[i][1] < price2 : 
             validated_trucks.append((truck_list[i][0], truck_list[i][1]))
             price2=truck_list[i][1]
-    validated_trucks=validated_trucks[::-1] #on retourne la liste pour avoir l'ordre croissant de prix
-    return validated_trucks
-
-def choose_truck(power, truck_list): #truck_list =liste de (power, price) triée
+    validated_trucks=validated_trucks[::-1] # On retourne la liste pour avoir l'ordre croissant de prix
     if power > truck_list[-1][0]: 
-        return None #si même celui qui a la puissance la plus grande ne peut pas faire le trajet, aucun camion peut le faire
-    #on va faire une dichotomie sur l'indice des camions
+        return None # Si même celui qui a la puissance la plus grande ne peut pas faire le trajet, aucun camion peut le faire
+    # On va faire une dichotomie sur l'indice des camions
     first = 0
-    last = len(truck_list) - 1
+    last = len(validated_trucks) - 1
     while first < last:
         middle = (first+last) // 2
-        truck = truck_list[middle]
+        truck = validated_trucks[middle]
         if truck[0] < power:
             first = middle + 1
         else: 
-            last =  middle
-    return truck_list[first] #on renvoie le camion choisi
+            last = middle
+    return validated_trucks[first] # On renvoie le camion choisi
 
 
+def naive_algorithm(routes, truck_list, B = 25000000000):
+    total_profit = 0
+    available_money = B
+    features = []
+    for path, profit, power in routes:
+        chosen_truck = truck_choice(power, truck_list) # On choisit le camion pour cette puissance
+        if chosen_truck is None :
+            features.append((path, profit, None))
+        elif chosen_truck[1] > available_money:
+            features.append((path, profit, None))
+        else : 
+            available_money -= chosen_truck[1] # On retire le prix du camion
+            features.append((path, profit, chosen_truck))
+            total_profit += profit # On ajoute le profit 
+    return features, profit
+
+''' Le problème de l'algorithme est qu'il associe un camion au premier trajet, puis au deuxieme, etc, dans cet ordre'''
+'''et donc le profit dépend de l'ordre dans le fichier routes, et n'est donc pas forcément optimal'''
 
 
 
