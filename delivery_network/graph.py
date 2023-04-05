@@ -110,7 +110,7 @@ class Graph:
 
 
 ###Question3 
-    def get_path_with_power(self, src, dest, power): # Complexité en O(nb_edges log(nb_edges))=O(Elog(E))
+    def get_path_with_power(self, src, dest, power): # Complexité en O(V+E)
         # On va faire quelque chose de récursif, on va à chaque fois regarder les voisins des voisins pour trouver le chemin
         # On va s'inspirer fortement de connected_components
         visited_node = {noeud:False for noeud in self.nodes}
@@ -123,7 +123,7 @@ class Graph:
                 neighbor, power_min, dist = neighbor
                 if not visited_node[neighbor] and power_min <= power: # On ne veut pas repasser un même noeud + il faut que la puissance de la voiture soit supérieure à la puissance de la route
                     visited_node[neighbor] = True # Le noeud voisin est visité
-                    res=path_research(neighbor, path+[neighbor]) # On applique au voisin, avec le chemin de base + le voisin
+                    res = path_research(neighbor, path+[neighbor]) # On applique au voisin, avec le chemin de base + le voisin
                     if res is not None:
                         return res
             return None # On a visité tous les voisins mais on n'a rien trouvé
@@ -138,7 +138,7 @@ class Graph:
         d_power[src] = 0 # La puissance nécessaire pour aller de src à src est 0
         path = {noeud:[] for noeud in self.nodes}
         path[src] = [src]
-        # On veut créer un sous-graphe tel que la distanc entre un sommet et src soit connue et minimale
+        # On veut créer un sous-graphe tel que la distance entre un sommet et src soit connue et minimale
         sub_graph = [(0,src)]
         while sub_graph != []:
             dist_node, node = min(sub_graph)
@@ -454,7 +454,8 @@ def trucks_from_file_dic(nb_file_trucks):
         power = int(line[0])
         price = int(line[1])
         dict_trucks[power] = price
-    return dict_trucks 
+    sorted_trucks = sorted(dict_trucks.items(), key=lambda x: x[1], reverse=False)
+    return sorted_trucks 
 
 def trucks_from_file_list(nb_file_trucks): 
     filename = "input/trucks." + str(nb_file_trucks) + ".in" #on crée le fichier et on l'ouvre
@@ -516,7 +517,33 @@ def naive_algorithm(routes, truck_list, B = 25000000000):
 '''et donc le profit dépend de l'ordre dans le fichier routes, et n'est donc pas forcément optimal'''
 
 
+'''On fait donc une autre méthode qui marche mieux'''
 
+# Using greedy method
+def knapsack(trucks, paths, budget):
+    
+    # On va initialiser nos variables 
+    used_trucks = {} # Camions utilisés
+    used_paths = [] # Chemins parcourus
+    total_profit = 0 # Profit récupéré
+    remaining_budget = budget # Budget restant 
+    # Notre liste path est déjà triée par ordre decroissant en termes de profits
+    # Les camions sont deja triés par ordre croissant en termes de prix 
+    # On parcourt les chemins et on trouve 
+    for i in range(len(paths)):
+        for j in range(len(trucks)):
+            if trucks[j][0] >= paths[i][3] and trucks[j][1] <= remaining_budget and paths[i] not in used_paths:
+            # On pose une condition sur la puissance de camion qui doit etre supérieure au minpower du chemin, 
+            # Le prix doit etre inférieur au budget restant 
+            # Et le chemin ne doit pas avoir déjà été traité
+                remaining_budget -= trucks[j][1] # On soustrait le prix du camion du budget
+                if trucks[j][0] in used_trucks:
+                    used_trucks[trucks[j][0]] += 1 
+                else:
+                    used_trucks[trucks[j][0]] = 1 
+                used_paths.append(paths[i]) # On rajoute le chemin traité à la liste des chemins
+                total_profit += paths[i][2] # On rajoute l'utilité du chemin parcouru 
+    return total_profit, used_paths, used_trucks, budget-remaining_budget
 
 
 
