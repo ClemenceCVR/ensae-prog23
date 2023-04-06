@@ -524,7 +524,7 @@ def truck_remove(truck_list):
     return validated_trucks
 
 def truck_for_routes(network, nb_file_route, nb_file_truck):
-    routes = routes_from_file_simple(nb_file_route)
+    routes = routes_from_file_simple(nb_file_route) #on va utiliser toutes les fonctions kruskal de la séance précédente
     trucks = truck_remove(trucks_from_file_list(nb_file_truck))   
     g = graph_from_file(network)
     g2 = kruskal(g)
@@ -533,7 +533,7 @@ def truck_for_routes(network, nb_file_route, nb_file_truck):
     max = len(trucks)
     power_t = int(trucks[middle][0])
     res = []
-    for route in routes:
+    for route in routes: # On fait une dichotomie
         a, b = min_power_kruskal(g, h, route[0][0], route[0][1])
         power_mini = int(a)
         middle = int((len(trucks)/2))
@@ -550,7 +550,7 @@ def truck_for_routes(network, nb_file_route, nb_file_truck):
         res.append((route, trucks[min +1]))
     return res
 
-def profit_best(network, nb_file_route, nb_file_trucks):
+def profit_best(network, nb_file_route, nb_file_trucks): # On veut trouver le profit maximal
     truck_routes = truck_for_routes(network, nb_file_route, nb_file_trucks)
     profit = 0
     B = 0
@@ -559,23 +559,23 @@ def profit_best(network, nb_file_route, nb_file_trucks):
     cost = 0
     powprof=[]
     truck_routes_ratio = []
-    for i in range(len(truck_routes)):
+    for i in range(len(truck_routes)): # On calcule profit coût et rapport pour trouver le plus intéressant
         profit_route = int(truck_routes[i][0][1])
         cost = int(truck_routes[i][1][1])
         rapport = profit_route/cost
         truck_routes_ratio.append(truck_routes[i] + (rapport,))
     truck_routes_ratio.sort(key=lambda truck_routes_ratio : truck_routes_ratio[2], reverse= True)
-    while B<25*10**9 and l < len(truck_routes_ratio):
+    while B<25*10**9 and l < len(truck_routes_ratio): 
         profit += truck_routes_ratio[l][0][1]
         B += truck_routes_ratio[l][1][1]
         powprof.append(truck_routes_ratio[l][0][0] + (truck_routes_ratio[l][1][0],))
         cost = truck_routes_ratio[l][1][0]
         profit_route = truck_routes_ratio[l][0][1]
         l += 1
-    if B > 25*10**9:
+    if B > 25*10**9: # Si le budget est suffisant
         powprof.pop(-1)
-        B = B - cost
-        profit = profit - profit_route
+        B = B - cost # On retire le coût
+        profit = profit - profit_route # On calcule le profit 
     powprof = [profit] + powprof
     B=str(B)
     y = "Le profit est " + B
