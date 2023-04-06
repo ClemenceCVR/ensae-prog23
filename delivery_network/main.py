@@ -5,7 +5,7 @@ camion = trucks_from_file_list(1)
 camiontrie= sorted_trucks(camion)
 #print('camiontrie', camiontrie)
 choisi= choose_truck(2800000, camiontrie)
-print(choisi)
+#print(choisi)
 
 '''camions = [(2000, 5), (1000, 3), (3000, 4), (4000, 7)]
 liste_camions = sorted_trucks(camions)
