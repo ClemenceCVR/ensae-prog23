@@ -130,7 +130,7 @@ class Graph:
         return path_research(src, [src]) # On part de la source "src"
 
 ###Question5 : bonus
-    def get_shorter_path_with_power(self, src, dest, power): #  Complexité en O(E(V+E)log(V))
+    def get_shorter_path_with_power(self, src, dest, power): #  Complexité en O((V+E)log(V))
         # On va utiliser l'algorithme de Dijkstra avec la condition sur la puissance
         d_dist = {noeud : None for noeud in self.nodes}
         d_dist[src] = 0 # La distance entre src et src est 0
@@ -183,7 +183,7 @@ class Graph:
         
         a = 0
         b = 1
-        def dichotomie(a,b):
+        def dichotomie(a,b): # On fait une dichotomie 
             while b-a > 0.2:
                 if self.get_path_with_power2(src, dest, (a+b)/2)!= None:
                     b = (a+b)/2
@@ -191,7 +191,7 @@ class Graph:
                     a = (a+b)/2
                 dichotomie(a,b)
             return self.get_path_with_power2(src, dest,b), b
-        while self.get_path_with_power2(src, dest,b) == None:
+        while self.get_path_with_power2(src, dest,b) == None: # Si aucun trajet n'est possible, on augmente b pour majorer la puissance et appliquer la dichotomie car la puissance ne sera pas de 1, certainement
             b=2*b
         return dichotomie(a,b)
 
@@ -417,7 +417,6 @@ def estimated_time_kruskal(nb_file): # Entrer le numéro du fichier
 
 ###Séance 4
 ###Question 18
-
 def routes_from_file(nb_file_routes): 
     filename = "input/routes." + str(nb_file_routes) + ".in"
     f = open(filename, 'r')
@@ -441,7 +440,6 @@ def routes_from_file(nb_file_routes):
 
 
 # L'algo du sac à dos ne donne pas une solution exacte 
-# Tester les fichiers à la main mais aussi faire des fichiers tests
 # Pour la méthode exacte, la complexité est exponentielle 
 
 def trucks_from_file_dic(nb_file_trucks): 
@@ -469,55 +467,7 @@ def trucks_from_file_list(nb_file_trucks):
         truck_list.append((power, price)) #on ajoute à la liste de camions
     return truck_list
 
-'''Le but de la fonction suivante est de retirer les camions avec une puissance plus faible et un prix plus élevé qu'un autre camion, 
-(le camion est moins maniable et rentable), puis de choisir le meilleur camion pour une puissance de trajet donnée'''
-
-def truck_choice(power, truck_list):
-    truck_list = sorted(truck_list, key= lambda u: -u[0]) # On trie la liste par ordre décroissant de puissance
-    validated_trucks = [truck_list[0]] # On initialise avec le premier
-    price2=truck_list[0][1] # On initialise la variable de prix au premier prix 
-    for i in range(1, len(truck_list)):
-        # Si le prix du camion est inférieur au prix actuel, on ajoute le camion à la liste validée et on met à jour le prix actuel
-        if truck_list[i][1] < price2 : 
-            validated_trucks.append((truck_list[i][0], truck_list[i][1]))
-            price2=truck_list[i][1]
-    validated_trucks=validated_trucks[::-1] # On retourne la liste pour avoir l'ordre croissant de prix
-    if power > truck_list[-1][0]: 
-        return None # Si même celui qui a la puissance la plus grande ne peut pas faire le trajet, aucun camion peut le faire
-    # On va faire une dichotomie sur l'indice des camions
-    first = 0
-    last = len(validated_trucks) - 1
-    while first < last:
-        middle = (first+last) // 2
-        truck = validated_trucks[middle]
-        if truck[0] < power:
-            first = middle + 1
-        else: 
-            last = middle
-    return validated_trucks[first] # On renvoie le camion choisi
-
-
-def naive_algorithm(routes, truck_list, B = 25000000000):
-    total_profit = 0
-    available_money = B
-    features = []
-    for path, profit, power in routes:
-        chosen_truck = truck_choice(power, truck_list) # On choisit le camion pour cette puissance
-        if chosen_truck is None :
-            features.append((path, profit, None))
-        elif chosen_truck[1] > available_money:
-            features.append((path, profit, None))
-        else : 
-            available_money -= chosen_truck[1] # On retire le prix du camion
-            features.append((path, profit, chosen_truck))
-            total_profit += profit # On ajoute le profit 
-    return features, profit
-
-''' Le problème de l'algorithme est qu'il associe un camion au premier trajet, puis au deuxieme, etc, dans cet ordre'''
-'''et donc le profit dépend de l'ordre dans le fichier routes, et n'est donc pas forcément optimal'''
-
-
-'''On fait donc une autre méthode qui marche mieux'''
+'''On essaye une méthode mais elle ne marche pas sur le routes 2 donc la meilleure méthode est celle tout en bas'''
 
 # Using greedy method
 def knapsack(trucks, paths, budget):
@@ -546,9 +496,91 @@ def knapsack(trucks, paths, budget):
     return total_profit, used_paths, used_trucks, budget-remaining_budget
 
 
+'''On teste encore une autre méthode, celle qui marche pour tout'''
+'''Celle-ci marche sur toutes les routes'''
 
 
+def routes_from_file_simple(nb_file_routes): 
+    res=[]
+    filename = "input/routes." + str(nb_file_routes) + ".in"
+    f = open(filename, 'r')
+    n = int(f.readline().rstrip())
+    for i in range(n):
+        line=f.readline().split()
+        src, dest, profit = map(int, line)
+        res.append([(src, dest), profit])
+    return res
 
+def truck_remove(truck_list):
+    truck_list = sorted(truck_list, key= lambda u: -u[0]) # On trie la liste par ordre décroissant de puissance
+    validated_trucks = [truck_list[0]] # On initialise avec le premier
+    price2=truck_list[0][1] # On initialise la variable de prix au premier prix 
+    for i in range(1, len(truck_list)):
+        # Si le prix du camion est inférieur au prix actuel, on ajoute le camion à la liste validée et on met à jour le prix actuel
+        if truck_list[i][1] < price2 : 
+            validated_trucks.append((truck_list[i][0], truck_list[i][1]))
+            price2=truck_list[i][1]
+    validated_trucks=validated_trucks[::-1] # On retourne la liste pour avoir l'ordre croissant de prix
+    return validated_trucks
+
+def truck_for_routes(network, nb_file_route, nb_file_truck):
+    routes = routes_from_file_simple(nb_file_route)
+    trucks = truck_remove(trucks_from_file_list(nb_file_truck))   
+    g = graph_from_file(network)
+    g2 = kruskal(g)
+    h = oriented_tree(g2)
+    power_mini, middle, min = 0, 0, 0
+    max = len(trucks)
+    power_t = int(trucks[middle][0])
+    res = []
+    for route in routes:
+        a, b = min_power_kruskal(g, h, route[0][0], route[0][1])
+        power_mini = int(a)
+        middle = int((len(trucks)/2))
+        min = 0
+        max = len(trucks)
+        while max - min > 1:
+            power_t = int(trucks[middle][0])
+            if power_t > power_mini:
+                max = middle
+                middle = int( (middle + min) /2)
+            else:
+                min = middle
+                middle = int((middle+max)/2)
+        res.append((route, trucks[min +1]))
+    return res
+
+def profit_best(network, nb_file_route, nb_file_trucks):
+    truck_routes = truck_for_routes(network, nb_file_route, nb_file_trucks)
+    profit = 0
+    B = 0
+    l = 0
+    profit_route = 0
+    cost = 0
+    powprof=[]
+    truck_routes_ratio = []
+    for i in range(len(truck_routes)):
+        profit_route = int(truck_routes[i][0][1])
+        cost = int(truck_routes[i][1][1])
+        rapport = profit_route/cost
+        truck_routes_ratio.append(truck_routes[i] + (rapport,))
+    truck_routes_ratio.sort(key=lambda truck_routes_ratio : truck_routes_ratio[2], reverse= True)
+    while B<25*10**9 and l < len(truck_routes_ratio):
+        profit += truck_routes_ratio[l][0][1]
+        B += truck_routes_ratio[l][1][1]
+        powprof.append(truck_routes_ratio[l][0][0] + (truck_routes_ratio[l][1][0],))
+        cost = truck_routes_ratio[l][1][0]
+        profit_route = truck_routes_ratio[l][0][1]
+        l += 1
+    if B > 25*10**9:
+        powprof.pop(-1)
+        B = B - cost
+        profit = profit - profit_route
+    powprof = [profit] + powprof
+    B=str(B)
+    y = "Le profit est " + B
+    z = "Le budget utilisé est " + str(profit)
+    return powprof, z, y
 
 
 
